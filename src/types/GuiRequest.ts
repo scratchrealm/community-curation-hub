@@ -1,7 +1,8 @@
 import { Auth, isAuth } from "./Auth"
 import { Dataset, isDataset } from "./Dataset"
 import { isProject, Project } from "./Project"
-import validateObject, { isArrayOf, isEqualTo, isOneOf, isString, optional } from "./validateObject"
+import { isSubmission, Submission } from "./Submission"
+import validateObject, { isArrayOf, isBoolean, isEqualTo, isOneOf, isString, optional } from "./validateObject"
 
 //////////////////////////////////////////////////////////////////////////////////
 // getProjectsForUser
@@ -28,6 +29,33 @@ export type GetProjectsForUserResponse = {
 export const isGetProjectsForUserResponse = (x: any): x is GetProjectsForUserResponse => {
     return validateObject(x, {
         type: isEqualTo('getProjectsForUser'),
+        projects: isArrayOf(isProject)
+    })
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// getPublicProjects
+
+export type GetPublicProjectsRequest = {
+    type: 'getPublicProjects'
+    auth: Auth
+}
+
+export const isGetPublicProjectsRequest = (x: any): x is GetPublicProjectsRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getPublicProjects'),
+        auth: isAuth
+    })
+}
+
+export type GetPublicProjectsResponse = {
+    type: 'getPublicProjects'
+    projects: Project[]
+}
+
+export const isGetPublicProjectsResponse = (x: any): x is GetPublicProjectsResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getPublicProjects'),
         projects: isArrayOf(isProject)
     })
 }
@@ -127,6 +155,7 @@ export type SetProjectAttributesRequest = {
     projectId: string
     label?: string
     description?: string
+    publicProject?: boolean
     auth: Auth
 }
 
@@ -136,6 +165,7 @@ export const isSetProjectAttributesRequest = (x: any): x is SetProjectAttributes
         projectId: isString,
         label: optional(isString),
         description: optional(isString),
+        publicProject: optional(isBoolean),
         auth: isAuth
     })
 }
@@ -174,7 +204,7 @@ export type GetDatasetsForProjectResponse = {
 
 export const isGetDatasetsForProjectResponse = (x: any): x is GetDatasetsForProjectResponse => {
     return validateObject(x, {
-        type: isEqualTo('getDatasetsForUser'),
+        type: isEqualTo('getDatasetsForProject'),
         datasets: isArrayOf(isDataset)
     })
 }
@@ -184,7 +214,6 @@ export const isGetDatasetsForProjectResponse = (x: any): x is GetDatasetsForProj
 
 export type GetDatasetRequest = {
     type: 'getDataset'
-    projectId: string
     datasetId: string
     auth: Auth
 }
@@ -192,7 +221,6 @@ export type GetDatasetRequest = {
 export const isGetDatasetRequest = (x: any): x is GetDatasetRequest => {
     return validateObject(x, {
         type: isEqualTo('getDataset'),
-        projectId: isString,
         datasetId: isString,
         auth: isAuth
     })
@@ -216,7 +244,8 @@ export const isGetDatasetResponse = (x: any): x is GetDatasetResponse => {
 export type AddDatasetRequest = {
     type: 'addDataset'
     projectId: string
-    datasetId: string
+    label: string
+    curationUrl: string
     auth: Auth
 }
 
@@ -224,18 +253,21 @@ export const isAddDatasetRequest = (x: any): x is AddDatasetRequest => {
     return validateObject(x, {
         type: isEqualTo('addDataset'),
         projectId: isString,
-        datasetId: isString,
+        label: isString,
+        curationUrl: isString,
         auth: isAuth
     })
 }
 
 export type AddDatasetResponse = {
     type: 'addDataset'
+    datasetId: string
 }
 
 export const isAddDatasetResponse = (x: any): x is AddDatasetResponse => {
     return validateObject(x, {
-        type: isEqualTo('addDataset')
+        type: isEqualTo('addDataset'),
+        datasetId: isString
     })
 }
 
@@ -244,7 +276,6 @@ export const isAddDatasetResponse = (x: any): x is AddDatasetResponse => {
 
 export type DeleteDatasetRequest = {
     type: 'deleteDataset'
-    projectId: string
     datasetId: string
     auth: Auth
 }
@@ -252,7 +283,6 @@ export type DeleteDatasetRequest = {
 export const isDeleteDatasetRequest = (x: any): x is DeleteDatasetRequest => {
     return validateObject(x, {
         type: isEqualTo('deleteDataset'),
-        projectId: isString,
         datasetId: isString,
         auth: isAuth
     })
@@ -273,8 +303,8 @@ export const isDeleteDatasetResponse = (x: any): x is DeleteDatasetResponse => {
 
 export type SetDatasetAttributesRequest = {
     type: 'setDatasetAttributes'
-    projectId: string
     datasetId: string
+    label?: string
     description?: string
     curationUrl?: string
     auth: Auth
@@ -283,8 +313,8 @@ export type SetDatasetAttributesRequest = {
 export const isSetDatasetAttributesRequest = (x: any): x is SetDatasetAttributesRequest => {
     return validateObject(x, {
         type: isEqualTo('setDatasetAttributes'),
-        projectId: isString,
         datasetId: isString,
+        label: isString,
         description: optional(isString),
         curationUrl: optional(isString),
         auth: isAuth
@@ -302,9 +332,159 @@ export const isSetDatasetAttributesResponse = (x: any): x is SetDatasetAttribute
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+// getSubmissionsForDataset
+
+export type GetSubmissionsForDatasetRequest = {
+    type: 'getSubmissionsForDataset'
+    datasetId: string
+    auth: Auth
+}
+
+export const isGetSubmissionsForDatasetRequest = (x: any): x is GetSubmissionsForDatasetRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getSubmissionsForDataset'),
+        datasetId: optional(isString),
+        auth: isAuth
+    })
+}
+
+export type GetSubmissionsForDatasetResponse = {
+    type: 'getSubmissionsForDataset'
+    submissions: Submission[]
+}
+
+export const isGetSubmissionsForDatasetResponse = (x: any): x is GetSubmissionsForDatasetResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getSubmissionsForDataset'),
+        submissions: isArrayOf(isSubmission)
+    })
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// getSubmission
+
+export type GetSubmissionRequest = {
+    type: 'getSubmission'
+    submissionId: string
+    auth: Auth
+}
+
+export const isGetSubmissionRequest = (x: any): x is GetSubmissionRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getSubmission'),
+        submissionId: isString,
+        auth: isAuth
+    })
+}
+
+export type GetSubmissionResponse = {
+    type: 'getSubmission'
+    submission: Submission
+}
+
+export const isGetSubmissionResponse = (x: any): x is GetSubmissionResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getSubmission'),
+        submission: isSubmission
+    })
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// addSubmission
+
+export type AddSubmissionRequest = {
+    type: 'addSubmission'
+    datasetId: string
+    userId: string
+    submissionUri: string
+    auth: Auth
+}
+
+export const isAddSubmissionRequest = (x: any): x is AddSubmissionRequest => {
+    return validateObject(x, {
+        type: isEqualTo('addSubmission'),
+        datasetId: isString,
+        userId: isString,
+        submissionUri: isString,
+        auth: isAuth
+    })
+}
+
+export type AddSubmissionResponse = {
+    type: 'addSubmission'
+    submissionId: string
+}
+
+export const isAddSubmissionResponse = (x: any): x is AddSubmissionResponse => {
+    return validateObject(x, {
+        type: isEqualTo('addSubmission'),
+        submissionId: isString
+    })
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// deleteSubmission
+
+export type DeleteSubmissionRequest = {
+    type: 'deleteSubmission'
+    submissionId: string
+    auth: Auth
+}
+
+export const isDeleteSubmissionRequest = (x: any): x is DeleteSubmissionRequest => {
+    return validateObject(x, {
+        type: isEqualTo('deleteSubmission'),
+        submissionId: isString,
+        auth: isAuth
+    })
+}
+
+export type DeleteSubmissionResponse = {
+    type: 'deleteSubmission'
+}
+
+export const isDeleteSubmissionResponse = (x: any): x is DeleteSubmissionResponse => {
+    return validateObject(x, {
+        type: isEqualTo('deleteSubmission')
+    })
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// setSubmissionAttributes
+
+export type SetSubmissionAttributesRequest = {
+    type: 'setSubmissionAttributes'
+    submissionId: string
+    description?: string
+    submissionUri?: string
+    auth: Auth
+}
+
+export const isSetSubmissionAttributesRequest = (x: any): x is SetSubmissionAttributesRequest => {
+    return validateObject(x, {
+        type: isEqualTo('setSubmissionAttributes'),
+        submissionId: isString,
+        description: optional(isString),
+        submissionUri: optional(isString),
+        auth: isAuth
+    })
+}
+
+export type SetSubmissionAttributesResponse = {
+    type: 'setSubmissionAttributes'
+}
+
+export const isSetSubmissionAttributesResponse = (x: any): x is SetSubmissionAttributesResponse => {
+    return validateObject(x, {
+        type: isEqualTo('setSubmissionAttributes')
+    })
+}
+
+//////////////////////////////////////////////////////////////////////////////////
 
 export type GuiRequest =
     GetProjectsForUserRequest |
+    GetPublicProjectsRequest |
     GetProjectRequest |
     AddProjectRequest |
     DeleteProjectRequest |
@@ -313,11 +493,17 @@ export type GuiRequest =
     GetDatasetRequest |
     AddDatasetRequest |
     DeleteDatasetRequest |
-    SetDatasetAttributesRequest
+    SetDatasetAttributesRequest |
+    GetSubmissionsForDatasetRequest |
+    GetSubmissionRequest |
+    AddSubmissionRequest |
+    DeleteSubmissionRequest |
+    SetSubmissionAttributesRequest
 
 export const isGuiRequest = (x: any): x is GuiRequest => {
     return isOneOf([
         isGetProjectsForUserRequest,
+        isGetPublicProjectsRequest,
         isGetProjectRequest,
         isAddProjectRequest,
         isDeleteProjectRequest,
@@ -326,12 +512,18 @@ export const isGuiRequest = (x: any): x is GuiRequest => {
         isGetDatasetRequest,
         isAddDatasetRequest,
         isDeleteDatasetRequest,
-        isSetDatasetAttributesRequest
+        isSetDatasetAttributesRequest,
+        isGetSubmissionsForDatasetRequest,
+        isGetSubmissionRequest,
+        isAddSubmissionRequest,
+        isDeleteSubmissionRequest,
+        isSetSubmissionAttributesRequest
     ])(x)
 }
 
 export type GuiResponse =
     GetProjectsForUserResponse |
+    GetPublicProjectsResponse |
     GetProjectResponse |
     AddProjectResponse |
     DeleteProjectResponse |
@@ -340,11 +532,17 @@ export type GuiResponse =
     GetDatasetResponse |
     AddDatasetResponse |
     DeleteDatasetResponse |
-    SetDatasetAttributesResponse
+    SetDatasetAttributesResponse |
+    GetSubmissionsForDatasetResponse |
+    GetSubmissionResponse |
+    AddSubmissionResponse |
+    DeleteSubmissionResponse |
+    SetSubmissionAttributesResponse
 
 export const isGuiResponse = (x: any): x is GuiResponse => {
     return isOneOf([
         isGetProjectsForUserResponse,
+        isGetPublicProjectsResponse,
         isGetProjectResponse,
         isAddProjectResponse,
         isDeleteProjectResponse,
@@ -353,6 +551,11 @@ export const isGuiResponse = (x: any): x is GuiResponse => {
         isGetDatasetResponse,
         isAddDatasetResponse,
         isDeleteDatasetResponse,
-        isSetDatasetAttributesResponse
+        isSetDatasetAttributesResponse,
+        isGetSubmissionsForDatasetResponse,
+        isGetSubmissionResponse,
+        isAddSubmissionResponse,
+        isDeleteSubmissionResponse,
+        isSetSubmissionAttributesResponse
     ])(x)
 }

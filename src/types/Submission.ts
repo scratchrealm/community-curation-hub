@@ -4,7 +4,9 @@ export type Submission = {
     projectId: string
     datasetId: string
     submissionId: string
-    uri: string
+    userId: string
+    description: string
+    submissionUri: string
 }
 
 export const isSubmission = (x: any): x is Submission => {
@@ -12,6 +14,8 @@ export const isSubmission = (x: any): x is Submission => {
         projectId: isString,
         datasetId: isString,
         submissionId: isString,
-        uri: isString
+        userId: isString,
+        description: isString,
+        submissionUri: isString
     })
 }

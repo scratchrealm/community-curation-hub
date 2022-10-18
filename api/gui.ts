@@ -3,14 +3,20 @@ import axios from 'axios'
 import googleVerifyIdToken from '../apiHelpers/common/googleVerifyIdToken'
 import addDatasetHandler from '../apiHelpers/guiRequestHandlers/addDatasetHandler'
 import addProjectHandler from '../apiHelpers/guiRequestHandlers/addProjectHandler'
+import addSubmissionHandler from '../apiHelpers/guiRequestHandlers/addSubmissionHandler'
 import deleteDatasetHandler from '../apiHelpers/guiRequestHandlers/deleteDatasetHandler'
 import deleteProjectHandler from '../apiHelpers/guiRequestHandlers/deleteProjectHandler'
+import deleteSubmissionHandler from '../apiHelpers/guiRequestHandlers/deleteSubmissionHandler'
 import getDatasetHandler from '../apiHelpers/guiRequestHandlers/getDatasetHandler'
 import getDatasetsForProjectHandler from '../apiHelpers/guiRequestHandlers/getDatasetsForProjectHandler'
 import getProjectHandler from '../apiHelpers/guiRequestHandlers/getProjectHandler'
 import getProjectsForUserHandler from '../apiHelpers/guiRequestHandlers/getProjectsForUserHandler'
+import getPublicProjectsHandler from '../apiHelpers/guiRequestHandlers/getPublicProjectsHandler'
+import getSubmissionHandler from '../apiHelpers/guiRequestHandlers/getSubmissionHandler'
+import getSubmissionsForDatasetHandler from '../apiHelpers/guiRequestHandlers/getSubmissionsForDatasetHandler'
 import setDatasetAttributesHandler from '../apiHelpers/guiRequestHandlers/setDatasetAttributesHandler'
 import setProjectAttributesHandler from '../apiHelpers/guiRequestHandlers/setProjectAttributesHandler'
+import setSubmissionAttributesHandler from '../apiHelpers/guiRequestHandlers/setSubmissionAttributesHandler'
 import { isGuiRequest } from '../src/types/GuiRequest'
 
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY
@@ -70,6 +76,10 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
             // no recaptcha required
             return await getProjectsForUserHandler(request, verifiedUserId)
         }
+        else if (request.type === 'getPublicProjects') {
+            // no recaptcha required
+            return await getPublicProjectsHandler(request, verifiedUserId)
+        }
         else if (request.type === 'getProject') {
             // no recaptcha required
             return await getProjectHandler(request, verifiedUserId)
@@ -105,6 +115,32 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
                 throw Error('ReCaptcha required')
             }
             return await setDatasetAttributesHandler(request, verifiedUserId)
+        }
+        else if (request.type === 'addSubmission') {
+            if (!verifiedReCaptchaInfo) {
+                throw Error('ReCaptcha required')
+            }
+            return await addSubmissionHandler(request, verifiedUserId)
+        }
+        else if (request.type === 'deleteSubmission') {
+            if (!verifiedReCaptchaInfo) {
+                throw Error('ReCaptcha required')
+            }
+            return await deleteSubmissionHandler(request, verifiedUserId)
+        }
+        else if (request.type === 'getSubmissionsForDataset') {
+            // no recaptcha required
+            return await getSubmissionsForDatasetHandler(request, verifiedUserId)
+        }
+        else if (request.type === 'getSubmission') {
+            // no recaptcha required
+            return await getSubmissionHandler(request, verifiedUserId)
+        }
+        else if (request.type === 'setSubmissionAttributes') {
+            if (!verifiedReCaptchaInfo) {
+                throw Error('ReCaptcha required')
+            }
+            return await setSubmissionAttributesHandler(request, verifiedUserId)
         }
         else {
             throw Error(`Unexpected request type: ${request.type}`)

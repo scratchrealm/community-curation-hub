@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react"
 import { useSignedIn } from "../components/googleSignIn/GoogleSignIn"
 import useErrorMessage from "../errorMessageContext/useErrorMessage"
-import { AddProjectRequest, DeleteProjectRequest, GetProjectsForUserRequest, isAddProjectResponse, isDeleteProjectResponse, isGetProjectsForUserResponse } from "../types/GuiRequest"
+import { AddProjectRequest, DeleteProjectRequest, GetProjectsForUserRequest, GetPublicProjectsRequest, isAddProjectResponse, isDeleteProjectResponse, isGetProjectsForUserResponse, isGetPublicProjectsResponse } from "../types/GuiRequest"
 import { Project } from "../types/Project"
 import guiApiRequest from "./guiApiRequest"
 
-const useProjectsForUser = () => {
+const useProjects = (mode: 'public' | 'user') => {
     const [projects, setProjects] = useState<Project[] | undefined>(undefined)
     const { userId, googleIdToken } = useSignedIn()
     const [refreshCode, setRefreshCode] = useState<number>(0)
@@ -20,23 +20,40 @@ const useProjectsForUser = () => {
             setProjects(undefined)
             if (!userId) return
             let canceled = false
-            const req: GetProjectsForUserRequest = {
-                type: 'getProjectsForUser',
-                userId,
-                auth: { userId, googleIdToken }
+            if (mode === 'user') {
+                const req: GetProjectsForUserRequest = {
+                    type: 'getProjectsForUser',
+                    userId,
+                    auth: { userId, googleIdToken }
+                }
+                const resp = await guiApiRequest(req, { reCaptcha: false, setErrorMessage })
+                if (!resp) return
+                if (!isGetProjectsForUserResponse(resp)) {
+                    console.warn(resp)
+                    throw Error('Unexpected response')
+                }
+                console.log(resp)
+                if (canceled) return
+                setProjects(resp.projects)
             }
-            const resp = await guiApiRequest(req, { reCaptcha: false, setErrorMessage })
-            if (!resp) return
-            if (!isGetProjectsForUserResponse(resp)) {
-                console.warn(resp)
-                throw Error('Unexpected response')
+            else if (mode === 'public') {
+                const req: GetPublicProjectsRequest = {
+                    type: 'getPublicProjects',
+                    auth: { userId, googleIdToken }
+                }
+                const resp = await guiApiRequest(req, { reCaptcha: false, setErrorMessage })
+                if (!resp) return
+                if (!isGetPublicProjectsResponse(resp)) {
+                    console.warn(resp)
+                    throw Error('Unexpected response')
+                }
+                console.log(resp)
+                if (canceled) return
+                setProjects(resp.projects)
             }
-            console.log(resp)
-            if (canceled) return
-            setProjects(resp.projects)
             return () => { canceled = true }
         })()
-    }, [userId, googleIdToken, refreshCode, setErrorMessage])
+    }, [userId, googleIdToken, refreshCode, setErrorMessage, mode])
 
     const addProject = useCallback((label: string) => {
         if (!userId) return
@@ -76,4 +93,4 @@ const useProjectsForUser = () => {
     return { projects, refreshProjects, addProject, deleteProject }
 }
 
-export default useProjectsForUser
+export default useProjects

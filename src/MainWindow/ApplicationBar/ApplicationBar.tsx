@@ -25,7 +25,7 @@ const ApplicationBar: FunctionComponent<Props> = ({ title, logo, onHome }) => {
 
     return (
         <span>
-            <AppBar position="static" style={{height: appBarHeight, color: 'white', background: 'rgb(22, 22, 66)', borderBottom: "solid 1px #444444"}}>
+            <AppBar position="static" style={{height: appBarHeight, color: 'white', background: 'rgb(22, 66, 22)', borderBottom: "solid 1px #444444"}}>
                 <Toolbar>
                 {
                     logo && (<img src={logo} alt="logo" height={30} style={{paddingBottom: 5, cursor: 'pointer'}} onClick={onHome} />)

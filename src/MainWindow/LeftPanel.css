@@ -1,9 +1,9 @@
 .LeftPanel {
-    background: #161642;
+    background: #164216;
 }
 
 .LeftPanel hr {
-    border: solid 1px #444466;
+    border: solid 1px #446644;
 }
 
 .LeftPanelItem {
@@ -23,5 +23,5 @@
 }
 
 .LeftPanelItem:hover {
-    background-color: #262662;
+    background-color: #266226;
 }

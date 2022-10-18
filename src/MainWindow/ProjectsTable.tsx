@@ -1,22 +1,23 @@
 import { IconButton } from '@material-ui/core';
 import { AddCircle, Refresh } from '@material-ui/icons';
-import React, { FunctionComponent, useCallback, useMemo } from 'react';
+import { FunctionComponent, useCallback, useMemo } from 'react';
 import Hyperlink from '../components/Hyperlink/Hyperlink';
 import NiceTable from '../components/NiceTable/NiceTable';
 import useVisible from '../misc/useVisible';
 import AddProjectControl from './AddProjectControl';
-import useProjectsForUser from './useProjectsForUser';
+import useProjects from './useProjects';
 import useRoute from './useRoute';
 
 type Props = {
+    mode: 'public' | 'user'
 }
 
-const ProjectsTable: FunctionComponent<Props> = () => {
+const ProjectsTable: FunctionComponent<Props> = ({mode}) => {
     const addVisible = useVisible()
 
     const {setRoute} = useRoute()
 
-    const { projects, refreshProjects, addProject, deleteProject } = useProjectsForUser()
+    const { projects, refreshProjects, addProject, deleteProject } = useProjects(mode)
 
     const columns = useMemo(() => ([
         {
@@ -30,6 +31,10 @@ const ProjectsTable: FunctionComponent<Props> = () => {
         {
             key: 'timestampCreated',
             label: 'Created'
+        },
+        {
+            key: 'public',
+            label: 'Public'
         }
     ]), [])
 
@@ -46,7 +51,8 @@ const ProjectsTable: FunctionComponent<Props> = () => {
                     )
                 },
                 ownerId: project.ownerId.toString(),
-                timestampCreated: timeSince(project.timestampCreated)
+                timestampCreated: timeSince(project.timestampCreated),
+                public: project.publicProject ? 'public' : 'not public'
             }
         }))
     ), [projects, setRoute])
@@ -57,7 +63,11 @@ const ProjectsTable: FunctionComponent<Props> = () => {
 
     return (
         <div style={{maxWidth: 1000}}>
-            <div className="PageHeading">Projects</div>
+            <div className="PageHeading">
+                {
+                    mode === 'public' ? <span>Public Projects</span> : <span>Your Projects</span>
+                }
+            </div>
             <IconButton onClick={refreshProjects} title="Refresh projects"><Refresh /></IconButton>
             <IconButton onClick={addVisible.show} title="Add project"><AddCircle /></IconButton>
             {

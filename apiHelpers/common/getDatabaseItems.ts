@@ -52,35 +52,36 @@ export const invalidateProject = (projectId: string) => {
     projectObjectCache.delete(projectId)
 }
 
-export const getDataset = async (projectId: string, datasetId: string) => {
-    const k = `${projectId}:${datasetId}`
-    const x = datasetObjectCache.get(k)
+export const getDataset = async (datasetId: string) => {
+    const x = datasetObjectCache.get(datasetId)
     if (x) return x
     const db = firestoreDatabase()
     const datasetsCollection = db.collection('cch.datasets')
-    const datasetSnapshot = await datasetsCollection.doc(k).get()
-    if (!datasetSnapshot.exists) throw Error(`Dataset does not exist: ${k}`)
+    const datasetSnapshot = await datasetsCollection.doc(datasetId).get()
+    if (!datasetSnapshot.exists) throw Error(`Dataset does not exist: ${datasetId}`)
     const dataset = datasetSnapshot.data()
     if (!isDataset(dataset)) throw Error('Invalid dataset in database')
     datasetObjectCache.set(datasetId.toString(), dataset)
     return dataset
 }
 
-export const invalidateDataset = (projectId: string, datasetId: string) => {
-    const k = `${projectId}:${datasetId}`
-    datasetObjectCache.delete(k)
+export const invalidateDataset = (datasetId: string) => {
+    datasetObjectCache.delete(datasetId)
 }
 
-export const getSubmission = async (projectId: string, datasetId: string, submissionId: string) => {
-    const k = `${projectId}:${datasetId}:${submissionId}`
-    const x = submissionObjectCache.get(k)
+export const getSubmission = async (submissionId: string) => {
+    const x = submissionObjectCache.get(submissionId)
     if (x) return x
     const db = firestoreDatabase()
     const submissionsCollection = db.collection('cch.submissions')
-    const submissionSnapshot = await submissionsCollection.doc(k).get()
-    if (!submissionSnapshot.exists) throw Error(`Submission does not exist: ${k}`)
+    const submissionSnapshot = await submissionsCollection.doc(submissionId).get()
+    if (!submissionSnapshot.exists) throw Error(`Submission does not exist: ${submissionId}`)
     const submission = submissionSnapshot.data()
     if (!isSubmission(submission)) throw Error('Invalid submission in database')
     submissionObjectCache.set(submissionId.toString(), submission)
     return submission
+}
+
+export const invalidateSubmission = (submissionId: string) => {
+    submissionObjectCache.delete(submissionId)
 }

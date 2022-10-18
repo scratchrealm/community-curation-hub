@@ -8,12 +8,9 @@ export type Route = {
     projectId: string
 } | {
     page: 'dataset',
-    projectId: string
     datasetId: string
 } | {
     page: 'submission',
-    projectId: string
-    datasetId: string
     submissionId: string
 } | {
     page: 'admin'
@@ -25,33 +22,28 @@ const useRoute = () => {
 
     const p = location.pathname
     let route: Route = {page: 'home'}
-    if (p.startsWith('/p/')) {
+    if (p.startsWith('/project/')) {
         const x = p.split('/')
         const projectId = x[2]
-        if (x[3] === 'd') {
-            const datasetId = x[4]
-            if (x[5] === 's') {
-                const submissionId = x[6]
-                route = {
-                    page: 'submission',
-                    projectId,
-                    datasetId,
-                    submissionId
-                }
-            }
-            else {
-                route = {
-                    page: 'dataset',
-                    projectId,
-                    datasetId
-                }
-            }
+        route = {
+            page: 'project',
+            projectId
         }
-        else {
-            route = {
-                page: 'project',
-                projectId
-            }
+    }
+    else if (p.startsWith('/dataset/')) {
+        const x = p.split('/')
+        const datasetId = x[2]
+        route = {
+            page: 'dataset',
+            datasetId
+        }
+    }
+    else if (p.startsWith('/submission/')) {
+        const x = p.split('/')
+        const submissionId = x[2]
+        route = {
+            page: 'submission',
+            submissionId
         }
     }
     else if (p === '/admin') {
@@ -63,13 +55,13 @@ const useRoute = () => {
     const setRoute = useCallback((route: Route) => {
         let pathname2 = '/home'
         if (route.page === 'project') {
-            pathname2 = `/p/${route.projectId}`
+            pathname2 = `/project/${route.projectId}`
         }
         else if (route.page === 'dataset') {
-            pathname2 = `/p/${route.projectId}/d/${route.datasetId}`
+            pathname2 = `/dataset/${route.datasetId}`
         }
         else if (route.page === 'submission') {
-            pathname2 = `/p/${route.submissionId}/d/${route.datasetId}/s/${route.submissionId}`
+            pathname2 = `/submission/${route.submissionId}`
         }
         else if (route.page === 'admin') {
             pathname2 = `/admin`

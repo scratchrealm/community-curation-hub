@@ -38,13 +38,14 @@ const useDatasetsForProject = (projectId: string) => {
         })()
     }, [projectId, userId, googleIdToken, refreshCode, setErrorMessage])
 
-    const addDataset = useCallback((datasetId: string) => {
+    const addDataset = useCallback((label: string, o: {curationUrl: string}) => {
         if (!userId) return
             ; (async () => {
                 const req: AddDatasetRequest = {
                     type: 'addDataset',
                     projectId,
-                    datasetId,
+                    label,
+                    curationUrl: o.curationUrl,
                     auth: { userId, googleIdToken }
                 }
                 const resp = await guiApiRequest(req, { reCaptcha: true, setErrorMessage })
@@ -61,7 +62,6 @@ const useDatasetsForProject = (projectId: string) => {
             ; (async () => {
                 const req: DeleteDatasetRequest = {
                     type: 'deleteDataset',
-                    projectId,
                     datasetId,
                     auth: { userId, googleIdToken }
                 }
@@ -72,7 +72,7 @@ const useDatasetsForProject = (projectId: string) => {
                 }
                 refreshDatasets()
             })()
-    }, [projectId, userId, googleIdToken, refreshDatasets, setErrorMessage])
+    }, [userId, googleIdToken, refreshDatasets, setErrorMessage])
 
     return { datasets, refreshDatasets, addDataset, deleteDataset }
 }

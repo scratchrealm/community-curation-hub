@@ -63,13 +63,10 @@ const MainWindow: FunctionComponent<Props> = () => {
                                 />
                             ) : (route.page === 'dataset') ? (
                                 <DatasetPage
-                                    projectId={route.projectId}
                                     datasetId={route.datasetId}
                                 />
                             ) : (route.page === 'submission') ? (
                                 <SubmissionPage
-                                    projectId={route.projectId}
-                                    datasetId={route.datasetId}
                                     submissionId={route.submissionId}
                                 />
                             ) : route.page === 'admin' ? (

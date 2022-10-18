@@ -19,7 +19,7 @@ const HomePage: FunctionComponent<Props> = () => {
                 signedIn ? (
                     <p>You are signed in as {userId}</p>
                 ) : (
-                    <p>You are not logged in. Sign in above.</p>
+                    <p>You are not signed in. Sign in above.</p>
                 )
             }
             <hr />
@@ -29,7 +29,9 @@ const HomePage: FunctionComponent<Props> = () => {
             </div>
             <p />
             <hr />
-            {signedIn && <ProjectsTable />}
+            {signedIn && <ProjectsTable mode={'public'} />}
+            <hr />
+            {signedIn && <ProjectsTable mode={'user'} />}
         </div>
     )
 }

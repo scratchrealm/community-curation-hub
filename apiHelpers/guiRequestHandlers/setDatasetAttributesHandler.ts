@@ -4,12 +4,11 @@ import firestoreDatabase from '../common/firestoreDatabase';
 import { invalidateDataset } from "../common/getDatabaseItems";
 
 const setDatasetAttributesHandler = async (request: SetDatasetAttributesRequest, verifiedUserId?: string): Promise<SetDatasetAttributesResponse> => {
-    const { projectId, datasetId, description, curationUrl } = request
+    const { datasetId, label, description, curationUrl } = request
 
     const db = firestoreDatabase()
     const collection = db.collection('cch.datasets')
-    const k = `${projectId}:${datasetId}`
-    const result = await collection.doc(k).get()
+    const result = await collection.doc(datasetId).get()
     if (!result.exists) {
         throw Error('Dataset does not exist.')
     }
@@ -20,6 +19,9 @@ const setDatasetAttributesHandler = async (request: SetDatasetAttributesRequest,
     const dataset2: Dataset = {
         ...dataset
     }
+    if (label !== undefined) {
+        dataset2.label = label
+    }
     if (description !== undefined) {
         dataset2.description = description
     }
@@ -28,7 +30,7 @@ const setDatasetAttributesHandler = async (request: SetDatasetAttributesRequest,
     }
     await result.ref.set(dataset2)
 
-    invalidateDataset(projectId, datasetId)
+    invalidateDataset(datasetId)
 
     return {
         type: 'setDatasetAttributes'

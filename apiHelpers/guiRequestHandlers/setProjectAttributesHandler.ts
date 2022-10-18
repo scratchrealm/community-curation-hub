@@ -4,7 +4,7 @@ import firestoreDatabase from '../common/firestoreDatabase';
 import { invalidateProject } from "../common/getDatabaseItems";
 
 const setProjectAttributesHandler = async (request: SetProjectAttributesRequest, verifiedUserId?: string): Promise<SetProjectAttributesResponse> => {
-    const { projectId, label, description } = request
+    const { projectId, label, description, publicProject } = request
 
     const db = firestoreDatabase()
     const collection = db.collection('cch.projects')
@@ -16,6 +16,9 @@ const setProjectAttributesHandler = async (request: SetProjectAttributesRequest,
     if (!isProject(project)) {
         throw Error('Invalid project in database')
     }
+    if (project.ownerId !== verifiedUserId) {
+        throw Error('Not authorized')
+    }
     const project2: Project = {
         ...project
     }
@@ -24,6 +27,9 @@ const setProjectAttributesHandler = async (request: SetProjectAttributesRequest,
     }
     if (description !== undefined) {
         project2.description = description
+    }
+    if (publicProject !== undefined) {
+        project2.publicProject = publicProject
     }
     await result.ref.set(project2)
 

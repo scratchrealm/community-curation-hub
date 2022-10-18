@@ -1,11 +1,11 @@
-import { blue, lightBlue } from '@material-ui/core/colors';
+import { green, lightGreen } from '@material-ui/core/colors';
 import { createTheme, ThemeOptions } from '@material-ui/core/styles';
 
 
 const themeOptions: ThemeOptions = {
     palette: {
-        primary: blue,
-        secondary: lightBlue,
+        primary: green,
+        secondary: lightGreen,
     },
     overrides: {
         MuiAccordionSummary: {
