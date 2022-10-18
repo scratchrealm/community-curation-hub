@@ -10,9 +10,10 @@ import useRoute from './useRoute';
 
 type Props = {
     projectId: string
+    isOwner: boolean
 }
 
-const DatasetsTable: FunctionComponent<Props> = ({projectId}) => {
+const DatasetsTable: FunctionComponent<Props> = ({projectId, isOwner}) => {
     const addVisible = useVisible()
 
     const {setRoute} = useRoute()
@@ -23,10 +24,6 @@ const DatasetsTable: FunctionComponent<Props> = ({projectId}) => {
         {
             key: 'dataset',
             label: 'Dataset'
-        },
-        {
-            key: 'curationUrl',
-            label: 'Curation URL'
         }
     ]), [])
 
@@ -41,9 +38,6 @@ const DatasetsTable: FunctionComponent<Props> = ({projectId}) => {
                             {dataset.label} ({dataset.datasetId})
                         </Hyperlink>
                     )
-                },
-                curationUrl: {
-                    element: <Hyperlink href={dataset.curationUrl} target="_blank">{dataset.curationUrl}</Hyperlink>
                 }
             }
         }))
@@ -57,7 +51,7 @@ const DatasetsTable: FunctionComponent<Props> = ({projectId}) => {
         <div style={{maxWidth: 1000}}>
             <div className="PageHeading">Datasets</div>
             <IconButton onClick={refreshDatasets} title="Refresh datasets"><Refresh /></IconButton>
-            <IconButton onClick={addVisible.show} title="Add dataset"><AddCircle /></IconButton>
+            {isOwner && <IconButton onClick={addVisible.show} title="Add dataset"><AddCircle /></IconButton>}
             {
                 addVisible.visible && (
                     <AddDatasetControl

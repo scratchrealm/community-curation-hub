@@ -61,6 +61,10 @@ const ProjectsTable: FunctionComponent<Props> = ({mode}) => {
         deleteProject(projectId)
     }, [deleteProject])
 
+    const canAdd = useMemo(() => (
+        mode === 'user'
+    ), [mode])
+
     return (
         <div style={{maxWidth: 1000}}>
             <div className="PageHeading">
@@ -69,7 +73,9 @@ const ProjectsTable: FunctionComponent<Props> = ({mode}) => {
                 }
             </div>
             <IconButton onClick={refreshProjects} title="Refresh projects"><Refresh /></IconButton>
-            <IconButton onClick={addVisible.show} title="Add project"><AddCircle /></IconButton>
+            {
+                canAdd && <IconButton onClick={addVisible.show} title="Add project"><AddCircle /></IconButton>
+            }
             {
                 addVisible.visible && (
                     <AddProjectControl

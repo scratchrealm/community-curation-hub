@@ -1,5 +1,7 @@
 import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 import { FunctionComponent } from "react";
+import Hyperlink from "../components/Hyperlink/Hyperlink";
+import useRoute from "./useRoute";
 import useSubmission from "./useSubmission";
 
 type Props ={
@@ -8,8 +10,12 @@ type Props ={
 
 const SubmissionPage: FunctionComponent<Props> = ({submissionId}) => {
 	const {submission} = useSubmission(submissionId)
+	const {setRoute} = useRoute()
 	return (
-		<div>
+		<div style={{paddingTop: 30}}>
+			<div>
+				{submission && <Hyperlink onClick={() => setRoute({page: 'dataset', datasetId: submission.datasetId})}>Back to dataset</Hyperlink>}
+			</div>
 			<Table>
 				<TableBody>
 					<TableRow>

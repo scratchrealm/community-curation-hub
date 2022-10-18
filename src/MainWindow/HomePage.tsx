@@ -25,7 +25,16 @@ const HomePage: FunctionComponent<Props> = () => {
             <hr />
             <p />
             <div className='PageBlurb'>
-                Projects consist of datasets which contain submissions.
+                <p>
+                    Community Curation Hub is a collection of datasets
+                    together with user-submitted curations. Datasets
+                    are organized into projects, and each dataset can
+                    have one or more curations submitted by users.
+                </p>
+                <p>
+                    Below is a list of public projects. Click a project
+                    to see the list of associated datasets.
+                </p>
             </div>
             <p />
             <hr />
