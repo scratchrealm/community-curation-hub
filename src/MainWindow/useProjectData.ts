@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useState } from "react"
 import { useSignedIn } from "../components/googleSignIn/GoogleSignIn"
 import useErrorMessage from "../errorMessageContext/useErrorMessage"
-import { GetDatasetRequest, isGetDatasetResponse } from "../types/GuiRequest"
 import { Dataset } from "../types/Dataset"
+import { GetProjectDataRequest, isGetProjectDataResponse } from "../types/GuiRequest"
+import { Project } from "../types/Project"
+import { Submission } from "../types/Submission"
 import guiApiRequest from "./guiApiRequest"
 
-const useDataset = (datasetId?: string) => {
-    const [dataset, setDataset] = useState<Dataset | undefined>(undefined)
+const useProjectData = (projectId: string) => {
+    const [projectData, setProjectData] = useState<{project: Project, datasets: Dataset[], submissions: Submission[]} | undefined>(undefined)
     const { userId, googleIdToken } = useSignedIn()
     const [refreshCode, setRefreshCode] = useState<number>(0)
-    const refreshDataset = useCallback(() => {
+    const refreshProjectData = useCallback(() => {
         setRefreshCode(c => (c + 1))
     }, [])
     const {setErrorMessage} = useErrorMessage()
@@ -17,28 +19,28 @@ const useDataset = (datasetId?: string) => {
     useEffect(() => {
         ; (async () => {
             setErrorMessage('')
-            setDataset(undefined)
-            if (!datasetId) return
+            setProjectData(undefined)
+            if (!projectId) return
             let canceled = false
-            const req: GetDatasetRequest = {
-                type: 'getDataset',
-                datasetId,
+            const req: GetProjectDataRequest = {
+                type: 'getProjectData',
+                projectId,
                 auth: { userId, googleIdToken }
             }
             const resp = await guiApiRequest(req, { reCaptcha: false, setErrorMessage })
             if (!resp) return
-            if (!isGetDatasetResponse(resp)) {
+            if (!isGetProjectDataResponse(resp)) {
                 console.warn(resp)
                 throw Error('Unexpected response')
             }
             console.log(resp)
             if (canceled) return
-            setDataset(resp.dataset)
+            setProjectData({project: resp.project, datasets: resp.datasets, submissions: resp.submissions})
             return () => { canceled = true }
         })()
-    }, [userId, googleIdToken, datasetId, refreshCode, setErrorMessage])
+    }, [userId, googleIdToken, projectId, refreshCode, setErrorMessage])
 
-    return { dataset, refreshDataset }
+    return { projectData, refreshProjectData }
 }
 
-export default useDataset
+export default useProjectData

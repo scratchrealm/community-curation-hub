@@ -57,6 +57,7 @@ const DatasetPage: FunctionComponent<Props> = ({datasetId}) => {
 			<hr />
 			<SubmissionsTable
 				datasetId={datasetId}
+				dataset={dataset}
 			/>
 		</div>
 	)

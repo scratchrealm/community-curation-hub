@@ -1,4 +1,4 @@
-import { CropSquare, HelpOutline, Home } from "@material-ui/icons";
+import { CropSquare, Home } from "@material-ui/icons";
 import { FunctionComponent, useMemo } from "react";
 import { useSignedIn } from "../components/googleSignIn/GoogleSignIn";
 import './LeftPanel.css';
@@ -49,13 +49,13 @@ const LeftPanel: FunctionComponent<Props> = ({width, height}) => {
             }
             <hr />
             <p />
-            <LeftPanelItem
+            {/* <LeftPanelItem
                 key="documentation"
                 label="Documentation"
                 icon={<HelpOutline />}
                 onClick={() => {(window as any).location="https://github.com/scratchrealm/community-curation-hub"}}
                 selected={false}
-            />
+            /> */}
         </div>
     )
 }

@@ -481,6 +481,40 @@ export const isSetSubmissionAttributesResponse = (x: any): x is SetSubmissionAtt
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+// getProjectData
+
+export type GetProjectDataRequest = {
+    type: 'getProjectData'
+    projectId: string
+    auth: Auth
+}
+
+export const isGetProjectDataRequest = (x: any): x is GetProjectDataRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getProjectData'),
+        projectId: isString,
+        auth: isAuth
+    })
+}
+
+export type GetProjectDataResponse = {
+    type: 'getProjectData'
+    project: Project
+    datasets: Dataset[]
+    submissions: Submission[]
+}
+
+export const isGetProjectDataResponse = (x: any): x is GetProjectDataResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getProjectData'),
+        project: isProject,
+        datasets: isArrayOf(isDataset),
+        submissions: isArrayOf(isSubmission)
+    })
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
 
 export type GuiRequest =
     GetProjectsForUserRequest |
@@ -498,7 +532,8 @@ export type GuiRequest =
     GetSubmissionRequest |
     AddSubmissionRequest |
     DeleteSubmissionRequest |
-    SetSubmissionAttributesRequest
+    SetSubmissionAttributesRequest |
+    GetProjectDataRequest
 
 export const isGuiRequest = (x: any): x is GuiRequest => {
     return isOneOf([
@@ -517,7 +552,8 @@ export const isGuiRequest = (x: any): x is GuiRequest => {
         isGetSubmissionRequest,
         isAddSubmissionRequest,
         isDeleteSubmissionRequest,
-        isSetSubmissionAttributesRequest
+        isSetSubmissionAttributesRequest,
+        isGetProjectDataRequest
     ])(x)
 }
 
@@ -537,7 +573,8 @@ export type GuiResponse =
     GetSubmissionResponse |
     AddSubmissionResponse |
     DeleteSubmissionResponse |
-    SetSubmissionAttributesResponse
+    SetSubmissionAttributesResponse |
+    GetProjectDataResponse
 
 export const isGuiResponse = (x: any): x is GuiResponse => {
     return isOneOf([
@@ -556,6 +593,7 @@ export const isGuiResponse = (x: any): x is GuiResponse => {
         isGetSubmissionResponse,
         isAddSubmissionResponse,
         isDeleteSubmissionResponse,
-        isSetSubmissionAttributesResponse
+        isSetSubmissionAttributesResponse,
+        isGetProjectDataResponse
     ])(x)
 }

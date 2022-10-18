@@ -9,6 +9,7 @@ import deleteProjectHandler from '../apiHelpers/guiRequestHandlers/deleteProject
 import deleteSubmissionHandler from '../apiHelpers/guiRequestHandlers/deleteSubmissionHandler'
 import getDatasetHandler from '../apiHelpers/guiRequestHandlers/getDatasetHandler'
 import getDatasetsForProjectHandler from '../apiHelpers/guiRequestHandlers/getDatasetsForProjectHandler'
+import getProjectDataHandler from '../apiHelpers/guiRequestHandlers/getProjectDataHandler'
 import getProjectHandler from '../apiHelpers/guiRequestHandlers/getProjectHandler'
 import getProjectsForUserHandler from '../apiHelpers/guiRequestHandlers/getProjectsForUserHandler'
 import getPublicProjectsHandler from '../apiHelpers/guiRequestHandlers/getPublicProjectsHandler'
@@ -141,6 +142,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
                 throw Error('ReCaptcha required')
             }
             return await setSubmissionAttributesHandler(request, verifiedUserId)
+        }
+        else if (request.type === 'getProjectData') {
+            return await getProjectDataHandler(request, verifiedUserId)
         }
         else {
             throw Error(`Unexpected request type: ${request.type}`)

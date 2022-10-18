@@ -4,6 +4,7 @@ import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import Hyperlink from '../components/Hyperlink/Hyperlink';
 import NiceTable from '../components/NiceTable/NiceTable';
 import useVisible from '../misc/useVisible';
+import { Submission } from '../types/Submission';
 import AddDatasetControl from './AddDatasetControl';
 import useDatasetsForProject from './useDatasetsForProject';
 import useRoute from './useRoute';
@@ -11,9 +12,10 @@ import useRoute from './useRoute';
 type Props = {
     projectId: string
     isOwner: boolean
+    submissionsInProject?: Submission[]
 }
 
-const DatasetsTable: FunctionComponent<Props> = ({projectId, isOwner}) => {
+const DatasetsTable: FunctionComponent<Props> = ({projectId, isOwner, submissionsInProject}) => {
     const addVisible = useVisible()
 
     const {setRoute} = useRoute()
@@ -24,6 +26,10 @@ const DatasetsTable: FunctionComponent<Props> = ({projectId, isOwner}) => {
         {
             key: 'dataset',
             label: 'Dataset'
+        },
+        {
+            key: 'submissions',
+            label: 'Submissions'
         }
     ]), [])
 
@@ -38,10 +44,13 @@ const DatasetsTable: FunctionComponent<Props> = ({projectId, isOwner}) => {
                             {dataset.label} ({dataset.datasetId})
                         </Hyperlink>
                     )
+                },
+                submissions: {
+                    text: submissionsInProject ? formSubmissionsString(submissionsInProject, dataset.datasetId) : '...'
                 }
             }
         }))
-    ), [datasets, setRoute])
+    ), [datasets, setRoute, submissionsInProject])
 
     const handleDeleteDataset = useCallback((datasetId: string) => {
         deleteDataset(datasetId)
@@ -72,6 +81,11 @@ const DatasetsTable: FunctionComponent<Props> = ({projectId, isOwner}) => {
             }
         </div>
     )
+}
+
+const formSubmissionsString = (submissionsInProject: Submission[], datasetId: string) => {
+    const aa = submissionsInProject.filter(s => (s.datasetId === datasetId))
+    return aa.map(s => (s.userId)).join(' | ')
 }
 
 // thanks https://stackoverflow.com/questions/3177836/how-to-format-time-since-xxx-e-g-4-minutes-ago-similar-to-stack-exchange-site

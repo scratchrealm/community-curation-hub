@@ -4,15 +4,17 @@ import { FunctionComponent, useCallback, useMemo } from 'react';
 import Hyperlink from '../components/Hyperlink/Hyperlink';
 import NiceTable from '../components/NiceTable/NiceTable';
 import useVisible from '../misc/useVisible';
+import { Dataset } from '../types/Dataset';
 import AddSubmissionControl from './AddSubmissionControl';
 import useRoute from './useRoute';
 import useSubmissionsForDataset from './useSubmissionsForDataset';
 
 type Props = {
     datasetId: string
+    dataset?: Dataset
 }
 
-const SubmissionsTable: FunctionComponent<Props> = ({datasetId}) => {
+const SubmissionsTable: FunctionComponent<Props> = ({datasetId, dataset}) => {
     const addVisible = useVisible()
 
     const {setRoute} = useRoute()
@@ -31,6 +33,10 @@ const SubmissionsTable: FunctionComponent<Props> = ({datasetId}) => {
         {
             key: 'submissionUri',
             label: 'URI'
+        },
+        {
+            key: 'view',
+            label: 'View'
         }
     ]), [])
 
@@ -51,10 +57,15 @@ const SubmissionsTable: FunctionComponent<Props> = ({datasetId}) => {
                 },
                 submissionUri: {
                     text: submission.submissionUri
+                },
+                view: {
+                    element: (
+                        dataset ? <Hyperlink href={formSubmissionUrl(dataset.curationUrl, submission.submissionUri)} target="_blank">view submission</Hyperlink> : <span />
+                    )
                 }
             }
         }))
-    ), [submissions, setRoute])
+    ), [submissions, setRoute, dataset])
 
     const handleDeleteSubmission = useCallback((submissionId: string) => {
         deleteSubmission(submissionId)
@@ -85,6 +96,46 @@ const SubmissionsTable: FunctionComponent<Props> = ({datasetId}) => {
             }
         </div>
     )
+}
+
+export const formSubmissionUrl = (curationUrl: string, submissionUri: string) => {
+    const ind = curationUrl.indexOf('?')
+    if (ind < 0) return ''
+    const queryString = curationUrl.slice(ind + 1)
+    const queryParams = parseQs(queryString);
+    const urlState = JSON.parse(queryParams['s'] || '{}')
+    urlState['sortingCuration'] = submissionUri
+    queryParams['s'] =JSONStringifyDeterministic(urlState)
+    const ret = `${curationUrl.slice(0, ind)}?${formQs(queryParams)}`
+    return ret
+}
+
+const parseQs = (qs: string) => {
+    const a = qs.split('&')
+    const ret: {[k: string]: string} = {}
+    for (let b of a) {
+        const ind1 = b.indexOf('=')
+        if (ind1 > 0) {
+            ret[b.slice(0, ind1)] = b.slice(ind1 + 1)
+        }
+    }
+    return ret
+}
+
+const formQs = (p: {[k: string]: string}) => {
+    const parts: string[] = []
+    for (let k in p) {
+        parts.push(`${k}=${p[k]}`)
+    }
+    return parts.join('&')
+}
+
+// Thanks: https://stackoverflow.com/questions/16167581/sort-object-properties-and-json-stringify
+export const JSONStringifyDeterministic = ( obj: any, space: string | number | undefined =undefined ) => {
+    var allKeys: string[] = [];
+    JSON.stringify( obj, function( key, value ){ allKeys.push( key ); return value; } )
+    allKeys.sort();
+    return JSON.stringify( obj, allKeys, space );
 }
 
 export default SubmissionsTable
